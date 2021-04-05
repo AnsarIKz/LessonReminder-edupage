@@ -23,30 +23,31 @@ groupId = -1001163700495
 
 
 def detectLesson():
-    global lessonTime
-    if str(timetable.get_lesson_at_time(EduTime(current.hour, current.minute))) == 'None':
-        if str(timetable.get_next_lesson_at_time(EduTime(current.hour, current.minute))) == 'None':
-            lessonTime = datetime.strptime('0:0', '%H:%M')
-            print('Уроков нет')
-            time.sleep(7200)
-        else:
-            lessonTime = datetime.strptime(str(timetable.get_next_lesson_at_time(EduTime(current.hour, current.minute)).length.start), "%H:%M")
-    else: 
-        print('Урок уже идет!')
+    try:
+        global lessonTime
+        if str(timetable.get_lesson_at_time(EduTime(current.hour, current.minute))) == 'None':
+            if str(timetable.get_next_lesson_at_time(EduTime(current.hour, current.minute))) == 'None':
+                lessonTime = datetime.strptime('0:0', '%H:%M')
+                print('Уроков нет')
+                time.sleep(7200)
+            else:
+                lessonTime = datetime.strptime(str(timetable.get_next_lesson_at_time(EduTime(current.hour, current.minute)).length.start), "%H:%M")
+        else: 
+            print('Урок уже идет!')
+    except:
+        bot.send_message(groupId, 'На сервере ошибка.')
+
 
 
 def sendReminder():  
     try:
         bot.send_message(groupId, 'Начался урок \n' + timetable.get_lesson_at_time(EduTime.now()).name + '\n' + timetable.get_lesson_at_time(EduTime.now()).teacher + ' \nСсылка - ' + allLinks[timetable.get_lesson_at_time(EduTime.now()).teacher])
+        detectLesson()
+        time.sleep(60)
     except:
         bot.send_message(groupId, 'Не удалось получить данные об уроке.')
         time.sleep(60)
-    detectLesson()
-    time.sleep(60)
-
-
-for hw in edupage.get_homework():
-    print(hw)   
+ 
 
 
 while True:
